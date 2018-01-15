@@ -16,7 +16,7 @@ export default class HNtrack {
     autoTrack(){
         let aList = document.getElementsByTagName("a")
         aList.addEventListener("click",()=>{
-
+            
         })
         let butonList = document.getElementsByTagName("button")
         butonList.addEventListener("click",()=>{
