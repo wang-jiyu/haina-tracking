@@ -1,0 +1,15 @@
+{
+  "name": "haina-tracking",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@60.205.162.223:sunlandong/haina-tracking.git"
+  },
+  "author": "sunlandong",
+  "license": "ISC"
+}
