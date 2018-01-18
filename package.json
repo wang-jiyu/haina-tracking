@@ -11,5 +11,11 @@
     "url": "git@60.205.162.223:sunlandong/haina-tracking.git"
   },
   "author": "sunlandong",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "express": "^4.16.2",
+    "http-proxy-middleware": "^0.17.4",
+    "opn": "^5.2.0"
+  }
 }

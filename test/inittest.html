@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        .height {
+            display: block;
+            height: 100px;
+        }
+    </style>
+    <title>埋点测试</title>
+    <script src="https://content.0606.com.cn/web/js/polyfill.min.js"></script>
+</head>
+
+<body>
+    <div id="explame">
+        <span class="height" data-eventId="200" data-parameter="80de0cbad36ab607f5d64548">
+            埋点测试1
+        </span class="height" data-eventId="201" data-parameter="80de0cbad36ab607f5d64548">
+
+        <p class="height" data-eventId="202" data-parameter="80de0cbad36ab607f5d64548">
+            埋点测试2
+        </p>
+
+        <div class="height" data-eventId="204" data-parameter="80de0cbad36ab607f5d64548">
+            埋点测试3
+        </div>
+
+        <button class="height" data-eventId="203" data-parameter="80de0cbad36ab607f5d64548">
+            埋点测试4
+        </button>
+
+        <a class="height" data-eventId="205" data-parameter="80de0cbad36ab607f5d64548">
+            埋点测试5
+        </a>
+    </div>
+
+    <script src="/static/zepto.js"></script>
+    <script src="/static/HNtrack.js"></script>
+</body>
+
+</html>
