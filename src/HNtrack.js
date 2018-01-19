@@ -1,24 +1,40 @@
 
 
-;(function () {
+; (function () {
+    Date.prototype.Format = function (fmt) { //author: meizz 
+        var o = {
+            "M+": this.getMonth() + 1, //月份 
+            "d+": this.getDate(), //日 
+            "h+": this.getHours(), //小时 
+            "m+": this.getMinutes(), //分 
+            "s+": this.getSeconds(), //秒 
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+            "S": this.getMilliseconds() //毫秒 
+        };
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
+
 
     var xFetch = /** @class */ (function () {
-        function xFetch(base_url,callback_timeout) {
+        function xFetch(base_url, callback_timeout) {
             this.base_url = base_url;
             this.callback_timeout = callback_timeout || 0;
         };
-        xFetch.prototype.initConfig = function(url, method, params, options) {
+        xFetch.prototype.initConfig = function (url, method, params, options) {
             let realoptions = {
                 type: method,
-                url:`${this.base_url}${url}`,
+                url: `${this.base_url}${url}`,
                 data: params,
-                contentType: 'application/json; charset=utf-8',
+                contentType: 'application/json;charset=utf-8',
                 timeout: this.callback_timeout,
                 ...options
             }
             return realoptions
         };
-        xFetch.prototype.request=function({ url, method, params, options } = config) {
+        xFetch.prototype.request = function ({ url, method, params, options } = config) {
             return new Promise((resolve, reject) => {
                 try {
                     console.log(this.initConfig)
@@ -31,33 +47,35 @@
                             reject(xhr, type)
                         }
                     })
+                    console.log(realoptions)
                     $.ajax(realoptions)
                 } catch (err) {
                     reject(err)
                 }
             })
         }
-    
-        xFetch.prototype.get=function(url, params, options) {
+
+        xFetch.prototype.get = function (url, params, options) {
             return this.request({
                 url, method: 'get', params, options
             })
-    
+
         }
-    
-        xFetch.prototype.post=function(url, params, options) {
+
+        xFetch.prototype.post = function (url, params, options) {
+            console.log(JSON.stringify(params))
             return this.request({
                 url, method: 'post', params, options
             })
         }
-    
-        xFetch.prototype.put=function(url, params, options) {
+
+        xFetch.prototype.put = function (url, params, options) {
             return this.request({
                 url, method: 'put', params, options
             })
         }
-    
-        xFetch.prototype.delete=function(url, params, options) {
+
+        xFetch.prototype.delete = function (url, params, options) {
             return this.request({
                 url, method: 'delete', params, options
             })
@@ -98,6 +116,22 @@
                 isAutoTrack: false,
                 isSinglePage: true
             }
+            
+            
+            // console.log(encryptByDES(JSON.stringify({
+            //     idfa:"72CD2664-E27A-451B-BC52-6654EDC44AD1",
+            //     appVersion:"2.2.0",
+            //     netEnvType:"wi-fi",
+            //     imei:"72CD2664-E27A-451B-BC52-6654EDC44AD1",
+            //     osVersion:"11.2",
+            //     channel:"appStore",
+            //     userId:"",
+            //     manufacturer:"Apple",
+            //     mobileType:"iOS",
+            //     ip:"192.168.3.93",
+            //     agent:"Hayner"
+            // }),"www.9086")==="fdyG6YwtU/JsfyxKxad4zNE3RYxBKwK7WvXgcSWsbNaNuZ/mswFNyoKgz8mUCMJyddcVjo2C8uWQOqlZdijD7r5X2KrD5a9afcFlBIJ3rm/xTtga6hss5XnlMbD6u+ulbH8sSsWneMzRN0WMQSsCu1r14HElrGzWjbmf5rMBTcqCoM/JlAjCcvKzWfSeWXYMPsAT/qcJTrqIT/tPnhyT2ZWKhen1uh6YPgsUCSjWHxdTLVxOw+WCv8aISujooTRXQekzrAckXlN91fRtNj1RO2tw4tELBskaAZWlMXfox7eWQfeiNHMmROpd+2cS7S/evc6AD20SqDAsiteVzyVHdY/diizfTEdoXlYQcXWv30s=")
+
             this.init(config)
         };
         HNtrack.prototype.init = function (config) {
@@ -121,9 +155,13 @@
             //页面访问pv，uv,单页面应用有问题
 
         };
-        HNtrack.prototype.getSignature=function(param) {
-            return md5(hmacSHA256(Object.keys(param).map(key => param[key])
-                .join(":"), 'B5CE6EC82F9D474F845508E847B75F29').toString().toUpperCase()).toString()
+        HNtrack.prototype.encryptByDES=function(message, key) {
+            var keyHex = CryptoJS.enc.Utf8.parse(key);
+            var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
+                mode: CryptoJS.mode.ECB,
+                padding: CryptoJS.pad.Pkcs7
+            });
+            return encrypted.toString();
         }
         HNtrack.prototype.getHeadEvents = function () {
             // data: {
@@ -139,54 +177,63 @@
             //     userId: '',
             //     signature: ''
             // },
-            var md = new MobileDetect(window.navigator.userAgent);
+            var device_type = window.navigator.userAgent
+            console.log(device_type)
+            var md = new MobileDetect(device_type);
             var os = md.os()
             var osVersion = ''
             var model = ''
             if (os == "iOS") {//ios系统的处理  
-                osVersion = md.os() + md.version("iPhone");  
-                model = md.mobile();  
+                osVersion = md.os() + md.version("iPhone");
+                model = md.mobile();
             } else if (os == "AndroidOS") {//Android系统的处理  
-                osVersion = md.os() + md.version("Android");  
-                var sss = device_type.split(";");  
-                var i = sss.contains("Build/");  
-                if (i > -1) {  
-                    model = sss[i].substring(0, sss[i].indexOf("Build/"));  
-                }  
-            } 
-            Object.assign(this.config,{
-                data:{
-                    agent:md.userAgent(),
-                    idfa:'',
-                    appVersion:'',
-                    mobileType:md.os(),
-                    channel:'',
-                    osVersion:osVersion,
-                    manufacturer:model,
-                    netEnvType:'',
-                    ip:'',
-                    userId:'',
-                    signature:''
+                osVersion = md.os() + md.version("Android");
+                var sss = device_type.split(";");
+                var i = sss.includes("Build/");
+                if (i) {
+                    model = sss[i].substring(0, sss[i].indexOf("Build/"));
+                }
+            }
+            Object.assign(this.config, {
+                data: {
+                    agent: md.userAgent(),
+                    idfa: '',
+                    appVersion: '',
+                    mobileType: md.os(),
+                    channel: '',
+                    osVersion: osVersion,
+                    manufacturer: model,
+                    netEnvType: '',
+                    ip: '',
+                    userId: ''
                 }
             })
+            return this.encryptByDES(JSON.stringify(this.config.data),"www.9086")
         };
-        HNtrack.prototype.isApp = function (){
+        HNtrack.prototype.isApp = function () {
             var ua = window.navigator.userAgent.toLowerCase();
             return ua.indexOf('hayner') > 1
         };
-        
+
         HNtrack.prototype.customTrack = function () {
             let _this = this
-            $(document).off("click","[data-eventId]")
-            $(document).on("click","[data-eventId]", function (e) {
+            $(document).off("click", "[data-eventid]")
+            $(document).on("click", "[data-eventid]", function (e) {
                 console.log('aaaaaaaaaaa')
-                let eventId = $(this).data("eventId")
-                let parameter = $(this).data("parameter").split(",")
-                let headerEvent = _this.getHeadEvents()
+                let eventId = $(this).data("eventid")
+                let parameter = {}
+                $(this).data("parameter").split(",").forEach(element => {
+                    let temp = element.split(":")
+                    if(temp&&temp.length>0){
+                        parameter[temp[0]] = temp[1]
+                    }
+                    
+                });
+                parameter = JSON.stringify(parameter)
 
-                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter }, {
+                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter,eventDate:new Date().Format("yyyy-MM-dd hh:mm:ss") }, {
                     headers: {
-                        headerEvent
+                        headerEvent: _this.getHeadEvents()
                     }
                 })
 
@@ -214,14 +261,14 @@
 
         };
         HNtrack.prototype.server_config = function () {
-            let env = 'production'
+            let env = 'development'
             if (window.location.hostname.split('.').length > 0) {
                 let hostname = window.location.hostname.split('.')[0]
                 if (hostname.indexOf("-") > -1) {
                     env = hostname.substring(hostname.indexOf("-") + 1)
                     // env = 'testing'
                 }
-            }else if(window.location.hostname.indexOf("localhost")>-1){
+            } else if (window.location.hostname.indexOf("192.168.3.73") > -1) {
                 env = 'development'
             }
             return env
