@@ -27,7 +27,7 @@
             let realoptions = {
                 type: method,
                 url: `${this.base_url}${url}`,
-                data: params,
+                data: JSON.stringify(params),
                 contentType: 'application/json;charset=utf-8',
                 timeout: this.callback_timeout,
                 ...options
@@ -163,6 +163,26 @@
             });
             return encrypted.toString();
         }
+        HNtrack.prototype.getAgent=function(){
+
+        }
+        HNtrack.prototype.getMobileType=function(){
+            if(window.navigator.appVersion.match(/iphone|iPad|iPod|iOS/gi)){
+                return 'IOS'
+            }else {
+                return 'Android'
+            }
+        }
+        HNtrack.prototype.getOsVersion=function(){
+            if(window.navigator.appVersion.match(/iphone|iPad|iPod|iOS/gi)){
+                return 'IOS'
+            }else {
+                return 'Android'
+            }
+        }
+        HNtrack.prototype.getManufacturer=function(){
+            
+        }
         HNtrack.prototype.getHeadEvents = function () {
             // data: {
             //     agent: '',
@@ -178,16 +198,15 @@
             //     signature: ''
             // },
             var device_type = window.navigator.userAgent
-            console.log(device_type)
             var md = new MobileDetect(device_type);
             var os = md.os()
             var osVersion = ''
             var model = ''
             if (os == "iOS") {//ios系统的处理  
-                osVersion = md.os() + md.version("iPhone");
+                osVersion = md.version("iPhone");
                 model = md.mobile();
             } else if (os == "AndroidOS") {//Android系统的处理  
-                osVersion = md.os() + md.version("Android");
+                osVersion = md.version("Android");
                 var sss = device_type.split(";");
                 var i = sss.includes("Build/");
                 if (i) {
@@ -208,6 +227,7 @@
                     userId: ''
                 }
             })
+            console.log(this.config)
             return this.encryptByDES(JSON.stringify(this.config.data),"www.9086")
         };
         HNtrack.prototype.isApp = function () {
@@ -219,7 +239,6 @@
             let _this = this
             $(document).off("click", "[data-eventid]")
             $(document).on("click", "[data-eventid]", function (e) {
-                console.log('aaaaaaaaaaa')
                 let eventId = $(this).data("eventid")
                 let parameter = {}
                 $(this).data("parameter").split(",").forEach(element => {
@@ -233,7 +252,7 @@
 
                 _this.HttpIntance.post('/appevent.jspa', { eventId, parameter,eventDate:new Date().Format("yyyy-MM-dd hh:mm:ss") }, {
                     headers: {
-                        headerEvent: _this.getHeadEvents()
+                        headerEvent:_this.getHeadEvents()
                     }
                 })
 

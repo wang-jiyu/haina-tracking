@@ -88,7 +88,7 @@ const proxyTable = {
         }
     },
     '/track': {
-        target: `http${isHttps ? 's' : ''}://stat-${globalEnv}.0606.com.cn`,
+        target: `http${isHttps ? 's' : ''}://stat-${globalEnv}.0606.com.cn/stat`,
         changeOrigin: true,
         pathRewrite: {
             '^/track': ''
