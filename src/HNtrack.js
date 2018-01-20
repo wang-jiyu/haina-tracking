@@ -13,7 +13,7 @@
         };
         if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
         for (var k in o)
-        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
         return fmt;
     }
 
@@ -116,8 +116,8 @@
                 isAutoTrack: false,
                 isSinglePage: true
             }
-            
-            
+
+            this.appVersion = window.navigator.appVersion
             // console.log(encryptByDES(JSON.stringify({
             //     idfa:"72CD2664-E27A-451B-BC52-6654EDC44AD1",
             //     appVersion:"2.2.0",
@@ -155,7 +155,7 @@
             //页面访问pv，uv,单页面应用有问题
 
         };
-        HNtrack.prototype.encryptByDES=function(message, key) {
+        HNtrack.prototype.encryptByDES = function (message, key) {
             var keyHex = CryptoJS.enc.Utf8.parse(key);
             var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
                 mode: CryptoJS.mode.ECB,
@@ -163,25 +163,67 @@
             });
             return encrypted.toString();
         }
-        HNtrack.prototype.getAgent=function(){
+        HNtrack.prototype.getAgent = function () {
+            try {
+                let app = this.appVersion
+                let start = app.lastIndexOf(" ")
+                let end = app.lastIndexOf("/")
+                return app.substring(start + 1, end)
+            }catch(err){
+                console.log('agent get error')
+            }
+        }
+        HNtrack.prototype.getMobileType = function () {
+            if (this.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
+                return 'IOS'
+            } else {
+                return 'Android'
+            }
+        }
+        HNtrack.prototype.getOsVersion = function () {
+            try {
+                if (this.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
+                    let ios = this.appVersion.match(/OS (\d+_)*(\d+)/gi)[0]
+                    if (ios) {
+                        ios = ios.substr(3).split("_").join(".")
+                    }
+                    return ios
+                } else {
+                    let android = this.appVersion.match(/Android (\d+.)*(\d+)/gi)[0]
+                    if (android) {
+                        android = android.replace(/[ ]/g, "_")
+                    }
+                    return android
+                }
+            } catch (err) {
+                console.log('osversion get error')
+            }
+        }
+        HNtrack.prototype.getManufacturer = function () {
+            try {
+                if (this.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
 
-        }
-        HNtrack.prototype.getMobileType=function(){
-            if(window.navigator.appVersion.match(/iphone|iPad|iPod|iOS/gi)){
-                return 'IOS'
-            }else {
-                return 'Android'
+                    return "Apple"
+                } else {
+                    let app = this.appVersion
+                    let index = app.indexOf("Android")
+                    let endIndex = app.indexOf(")", index)
+                    app = app.substring(index, endIndex)
+                    let seqindex = app.indexOf(";")
+                    app = app.substr(seqindex + 1)
+                    app = app.match(/[ ][\s\S]*[ ]/gi)[0].replace(/[ ]/g, "")
+                    return `Android_${app}`
+                }
+            } catch (err) {
+                console.log('manufacturer get error')
             }
         }
-        HNtrack.prototype.getOsVersion=function(){
-            if(window.navigator.appVersion.match(/iphone|iPad|iPod|iOS/gi)){
-                return 'IOS'
-            }else {
-                return 'Android'
+        HNtrack.prototype.getNetEnvType = function () {
+            try {
+                return window.navigator.connection && window.navigator.connection.effectiveType
+            } catch (error) {
+                console.log('NetEnvType get error')
             }
-        }
-        HNtrack.prototype.getManufacturer=function(){
-            
         }
         HNtrack.prototype.getHeadEvents = function () {
             // data: {
@@ -197,38 +239,22 @@
             //     userId: '',
             //     signature: ''
             // },
-            var device_type = window.navigator.userAgent
-            var md = new MobileDetect(device_type);
-            var os = md.os()
-            var osVersion = ''
-            var model = ''
-            if (os == "iOS") {//ios系统的处理  
-                osVersion = md.version("iPhone");
-                model = md.mobile();
-            } else if (os == "AndroidOS") {//Android系统的处理  
-                osVersion = md.version("Android");
-                var sss = device_type.split(";");
-                var i = sss.includes("Build/");
-                if (i) {
-                    model = sss[i].substring(0, sss[i].indexOf("Build/"));
-                }
-            }
             Object.assign(this.config, {
                 data: {
-                    agent: md.userAgent(),
+                    agent: this.getAgent(),
                     idfa: '',
                     appVersion: '',
-                    mobileType: md.os(),
+                    mobileType: this.getMobileType(),
                     channel: '',
-                    osVersion: osVersion,
-                    manufacturer: model,
-                    netEnvType: '',
+                    osVersion: this.getOsVersion(),
+                    manufacturer: this.getManufacturer(),
+                    netEnvType: this.getNetEnvType(),
                     ip: '',
                     userId: ''
                 }
             })
             console.log(this.config)
-            return this.encryptByDES(JSON.stringify(this.config.data),"www.9086")
+            return this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
         };
         HNtrack.prototype.isApp = function () {
             var ua = window.navigator.userAgent.toLowerCase();
@@ -243,16 +269,16 @@
                 let parameter = {}
                 $(this).data("parameter").split(",").forEach(element => {
                     let temp = element.split(":")
-                    if(temp&&temp.length>0){
+                    if (temp && temp.length > 0) {
                         parameter[temp[0]] = temp[1]
                     }
-                    
+
                 });
                 parameter = JSON.stringify(parameter)
 
-                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter,eventDate:new Date().Format("yyyy-MM-dd hh:mm:ss") }, {
+                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss") }, {
                     headers: {
-                        headerEvent:_this.getHeadEvents()
+                        headerEvent: _this.getHeadEvents()
                     }
                 })
 
