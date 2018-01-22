@@ -84,6 +84,13 @@
     }());
 
     var HNtrack = (function () {
+        let pageViewMap = {
+            '/mine/order/orderDetails':{
+                "1":"DZFOrder_Detail_Enter",
+                "2":"YZFOrder_Detail_Enter",
+                "3":"YQXOrder_Detail_Enter"
+            }
+        }
         function HNtrack(config) {
             this.url = {
                 production: 'https://stat.0606.com.cn/stat',
@@ -131,10 +138,11 @@
             //     ip:"192.168.3.93",
             //     agent:"Hayner"
             // }),"www.9086")==="fdyG6YwtU/JsfyxKxad4zNE3RYxBKwK7WvXgcSWsbNaNuZ/mswFNyoKgz8mUCMJyddcVjo2C8uWQOqlZdijD7r5X2KrD5a9afcFlBIJ3rm/xTtga6hss5XnlMbD6u+ulbH8sSsWneMzRN0WMQSsCu1r14HElrGzWjbmf5rMBTcqCoM/JlAjCcvKzWfSeWXYMPsAT/qcJTrqIT/tPnhyT2ZWKhen1uh6YPgsUCSjWHxdTLVxOw+WCv8aISujooTRXQekzrAckXlN91fRtNj1RO2tw4tELBskaAZWlMXfox7eWQfeiNHMmROpd+2cS7S/evc6AD20SqDAsiteVzyVHdY/diizfTEdoXlYQcXWv30s=")
-
+            
             this.init(config)
         };
         HNtrack.prototype.init = function (config) {
+            this.initHeader()
             this.config = Object.assign({}, this.config, config)
             this.HttpIntance = new xFetch(this.config.server_url, this.config.callback_timeout)
             if (this.config.isAutoTrack) {
@@ -225,30 +233,19 @@
                 console.log('NetEnvType get error')
             }
         }
-        HNtrack.prototype.getHeadEvents = function () {
-            // data: {
-            //     agent: '',
-            //     idfa: '',
-            //     appVersion: '',
-            //     mobileType: '',
-            //     channel: '',
-            //     osVersion: '',
-            //     manufacturer: '',
-            //     netEnvType: '',
-            //     ip: '',
-            //     userId: '',
-            //     signature: ''
-            // },
+        HNtrack.prototype.initHeader = function () {
             if (this.isApp()) {
-                window['getRequestHead'] = function (result) {
+                window['getRequestHead'] = (result) => {
                     delete window['getRequestHead'];
                     try {
-                        result = result;
+                        let json = result
+                        if(typeof json === 'string'){
+                            json = JSON.parse(json)
+                        }
+                        this.getHeadEvent = json.headEvents
+                        this.userId = json.userId
                     } catch (e) {
-                        console.log('出错！');
-                    }
-                    if (result) {
-                        callback(result);
+                        console.log(e);
                     }
                 }
                 if (typeof window['webkit'] != 'undefined') {
@@ -279,21 +276,37 @@
                     }
                 })
                 console.log(this.config)
-                return this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
+                this.getHeadEvent = this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
             }
         };
         HNtrack.prototype.isApp = function () {
             var ua = window.navigator.userAgent.toLowerCase();
             return ua.indexOf('hayner') > 1
         };
-
+        HNtrack.prototype.singlepageView = function(url){
+            window.addEventListener("onpageshow",()=>{
+                let eventId = ""
+                let pathname =  window.location.pathname
+                let search  = window.location.search
+                let modulestr = pageViewMap[pathname]
+                if(typeof modulestr === 'object'){
+                    if(pathname==='/mine/order/orderDetails')
+                    modulestr = modulestr[]
+                }
+                this.HttpIntance.post('/appevent.jspa', { eventId, parameter:"", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"),userId:this.userId }, {
+                    headers: {
+                        headerEvent: this.getHeadEvent
+                    }
+                })
+            })
+        }
         HNtrack.prototype.customTrack = function () {
             let _this = this
             $(document).off("click", "[data-eventid]")
             $(document).on("click", "[data-eventid]", function (e) {
                 let eventId = $(this).data("eventid")
                 let parameter = {}
-                $(this).data("parameter").split(",").forEach(element => {
+                $(this).data("parameter")&&$(this).data("parameter").split(",").forEach(element => {
                     let temp = element.split(":")
                     if (temp && temp.length > 0) {
                         parameter[temp[0]] = temp[1]
@@ -302,9 +315,9 @@
                 });
                 parameter = JSON.stringify(parameter)
 
-                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss") }, {
+                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"),userId:_this.userId }, {
                     headers: {
-                        headerEvent: _this.getHeadEvents()
+                        headerEvent: _this.getHeadEvent
                     }
                 })
 
