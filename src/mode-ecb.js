@@ -7,7 +7,7 @@ code.google.com/p/crypto-js/wiki/License
 /**
  * Electronic Codebook block mode.
  */
-CryptoJS.mode.ECB = (function () {
+;CryptoJS.mode.ECB = (function () {
     var ECB = CryptoJS.lib.BlockCipherMode.extend();
 
     ECB.Encryptor = ECB.extend({

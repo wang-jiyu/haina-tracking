@@ -169,7 +169,7 @@
                 let start = app.lastIndexOf(" ")
                 let end = app.lastIndexOf("/")
                 return app.substring(start + 1, end)
-            }catch(err){
+            } catch (err) {
                 console.log('agent get error')
             }
         }
@@ -239,22 +239,48 @@
             //     userId: '',
             //     signature: ''
             // },
-            Object.assign(this.config, {
-                data: {
-                    agent: this.getAgent(),
-                    idfa: '',
-                    appVersion: '',
-                    mobileType: this.getMobileType(),
-                    channel: '',
-                    osVersion: this.getOsVersion(),
-                    manufacturer: this.getManufacturer(),
-                    netEnvType: this.getNetEnvType(),
-                    ip: '',
-                    userId: ''
+            if (this.isApp()) {
+                window['getRequestHead'] = function (result) {
+                    delete window['getRequestHead'];
+                    try {
+                        result = result;
+                    } catch (e) {
+                        console.log('出错！');
+                    }
+                    if (result) {
+                        callback(result);
+                    }
                 }
-            })
-            console.log(this.config)
-            return this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
+                if (typeof window['webkit'] != 'undefined') {
+                    const realParam = {
+                        "nativeCallJS": "getRequestHead"
+                    }
+                    window['webkit'].messageHandlers.jsCallNative.postMessage(realParam);
+                } else if (/Android/i.test(window.navigator.userAgent)) {
+                    const realParam = {
+                        "nativecalljs": "getRequestHead"
+                    }
+                    const paramstr = JSON.stringify(realParam)
+                    window['haina'].pushEvent(paramstr);
+                }
+            } else {
+                Object.assign(this.config, {
+                    data: {
+                        agent: this.getAgent(),
+                        idfa: '',
+                        appVersion: '',
+                        mobileType: this.getMobileType(),
+                        channel: '',
+                        osVersion: this.getOsVersion(),
+                        manufacturer: this.getManufacturer(),
+                        netEnvType: this.getNetEnvType(),
+                        ip: '',
+                        userId: ''
+                    }
+                })
+                console.log(this.config)
+                return this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
+            }
         };
         HNtrack.prototype.isApp = function () {
             var ua = window.navigator.userAgent.toLowerCase();
@@ -306,14 +332,14 @@
 
         };
         HNtrack.prototype.server_config = function () {
-            let env = 'development'
-            if (window.location.hostname.split('.').length > 0) {
+            let env = 'production'
+            if (window.location.hostname.split('.').length > 0&&!(window.location.hostname.indexOf("localhost") > -1)) {
                 let hostname = window.location.hostname.split('.')[0]
                 if (hostname.indexOf("-") > -1) {
                     env = hostname.substring(hostname.indexOf("-") + 1)
                     // env = 'testing'
                 }
-            } else if (window.location.hostname.indexOf("192.168.3.73") > -1) {
+            } else if (window.location.hostname.indexOf("localhost") > -1) {
                 env = 'development'
             }
             return env

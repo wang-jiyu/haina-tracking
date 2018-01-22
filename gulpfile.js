@@ -9,11 +9,10 @@ const gzip = require('gulp-gzip');
 
 const version = '0.0.1'
 gulp.task("lib", function () {
-    gulp.src(['src/*.js'])
+    gulp.src(['src/zepto.js','src/download.js','src/tripledes.js','src/mode-ecb.js','src/HNtrack.js'])
         .pipe(concat(`hntrack_${version}.js`))
         .pipe(babel({
-            presets:['es2015','stage-0'],
-            plugins:['transform-runtime']
+            presets:['es2015','stage-0']
         }))
         .pipe(uglify())
         .pipe(gulp.dest('dist'))
