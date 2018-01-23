@@ -1,6 +1,6 @@
 
 
-; (function () {
+; (function ($) {
     Date.prototype.Format = function (fmt) { //author: meizz 
         var o = {
             "M+": this.getMonth() + 1, //月份 
@@ -232,48 +232,52 @@
             }
         }
         HNtrack.prototype.initHeader = function () {
-            if (this.isApp()) {
-                window['getRequestHead'] = (result) => {
-                    delete window['getRequestHead'];
-                    try {
-                        let json = result
-                        if (typeof json === 'string') {
-                            json = JSON.parse(json)
+            try {
+                if (this.isApp()) {
+                    window['getRequestHead'] = (result) => {
+                        delete window['getRequestHead'];
+                        try {
+                            let json = result
+                            if (typeof json === 'string') {
+                                json = JSON.parse(json)
+                            }
+                            this.getHeadEvent = json.headEvents
+                            this.userId = json.userId
+                        } catch (e) {
+                            console.log(e);
                         }
-                        this.getHeadEvent = json.headEvents
-                        this.userId = json.userId
-                    } catch (e) {
-                        console.log(e);
                     }
+                    if (typeof window['webkit'] != 'undefined') {
+                        const realParam = {
+                            "nativeCallJS": "getRequestHead"
+                        }
+                        window['webkit'].messageHandlers.jsCallNative.postMessage(realParam);
+                    } else if (/Android/i.test(window.navigator.userAgent)) {
+                        const realParam = {
+                            "nativecalljs": "getRequestHead"
+                        }
+                        const paramstr = JSON.stringify(realParam)
+                        window['haina'].pushEvent(paramstr);
+                    }
+                } else {
+                    Object.assign(this.config, {
+                        data: {
+                            agent: this.getAgent(),
+                            idfa: '',
+                            appVersion: '',
+                            mobileType: this.getMobileType(),
+                            channel: '',
+                            osVersion: this.getOsVersion(),
+                            manufacturer: this.getManufacturer(),
+                            netEnvType: this.getNetEnvType(),
+                            ip: '',
+                            userId: ''
+                        }
+                    })
+                    this.getHeadEvent = this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
                 }
-                if (typeof window['webkit'] != 'undefined') {
-                    const realParam = {
-                        "nativeCallJS": "getRequestHead"
-                    }
-                    window['webkit'].messageHandlers.jsCallNative.postMessage(realParam);
-                } else if (/Android/i.test(window.navigator.userAgent)) {
-                    const realParam = {
-                        "nativecalljs": "getRequestHead"
-                    }
-                    const paramstr = JSON.stringify(realParam)
-                    window['haina'].pushEvent(paramstr);
-                }
-            } else {
-                Object.assign(this.config, {
-                    data: {
-                        agent: this.getAgent(),
-                        idfa: '',
-                        appVersion: '',
-                        mobileType: this.getMobileType(),
-                        channel: '',
-                        osVersion: this.getOsVersion(),
-                        manufacturer: this.getManufacturer(),
-                        netEnvType: this.getNetEnvType(),
-                        ip: '',
-                        userId: ''
-                    }
-                })
-                this.getHeadEvent = this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
+            } catch (error) {
+                console.log(error)
             }
         };
         HNtrack.prototype.isApp = function () {
@@ -285,7 +289,7 @@
             window.onpageshow = function (event) {
                 let pathname = window.location.pathname
                 let search = window.location.search
-                let eventId = pageViewMap[pathname]||'MOBILE_PV_ENTER'
+                let eventId = pageViewMap[pathname] || 'MOBILE_PV_ENTER'
                 if (typeof eventId === 'object') {
                     switch (pathname) {
                         case '/mine/order/orderDetails':

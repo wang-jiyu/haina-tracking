@@ -1,34 +1,31 @@
 /**
  * Created by Administrator on 2017/10/24 0024.
  */
-;(function () {
+;(function ($) {
     var ua = window.navigator.userAgent.toLowerCase();
 
     function _IsInApp() {
         return ua.indexOf('hayner') > 1;
     }
     function generaterFooter() {
+        let downLoadImgUrl = 'https://content.0606.com.cn/m/assets/img/pic_bg.png'
         let $footer = $('<div />', {
             "id":"downloadApp",
             "css": {
                 'position': 'fixed',
+                "display":"flex",
+                "justify-content":"flex-end",
+                "align-items":"center",
                 'left': 0,
                 'right':0,
                 'bottom': 0,
                 'width': '100%',
                 'height': "1.2rem",
-                'z-index': 99
-            }
-        })
-        let downLoadImgUrl = 'https://m2.0606.com.cn/assets/images/zx_load.png'
-        let $downImg = $("<div />", {
-            "css": {
-                "width": '100%',
-                "height": "1.2rem",
+                'z-index': 99,
                 'background': 'url(' + downLoadImgUrl + ')',
                 'background-size': '100%'
             }
-        });
+        })
         let $a = $('<a />', {
             "class": "download",
             "css": {
@@ -41,31 +38,25 @@
                 "text-decoratio": "none"
             }
         })
-        $footer.append($downImg)
         $footer.append($a)
         $footer.on("click", ".download", function () {
             window.location = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.sz.nniu';
         })
-        let $colsed = $("<span />", {
-            "class": "downclose",
+        let closeimg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAVUExURf///0xpcf///////////////////ybWoNgAAAAHdFJOUx8A0g9czVgR5p0BAAABIklEQVRIx5WWTQ6CMBCFnym61nCDRvclXIBwAuPCtRvvfwX7RzqFaV+chGCcL483pZ0BNxHjDB/zJP+DSDvkMCowQsR0BKq8IKDnC7EBOEQNuCNgJDBCiUkATgNMAVSBLIGmQJZAWyBJoC2QJKCugVgLf13bwCkCrg2YCAC9Z6BdQ6oDPQvBBHoWggl0LXgTEvgu6T68JVA8Xl739GN9fIpLFI9na6PEYO2zuBSAT0SJNYMZEEWkzMblMiSQUpVADcRcLeABGSFZC+zDZ2uBfQwBWHoru/YFOEAfwUyqZdKF+mep9ZdFXzfdMHTL0U3Ltz09OPTo0cNLjz9vILQF0SbG2yBtpLQV82ZOxwEfKHQk8aHGxyIdrHw0S6f6cG98HvwAODk7pTzy15gAAAAASUVORK5CYII='
+        let $colsed = $("<div />", {
+            "id": "downclose",
             "css": {
-                "display":"flex",
-                "justify-content":"center",
-                "align-items":"center",
-                "width": '0.4rem',
-                "height": '0.4rem',
-                "background": '#777',
-                "position": 'absolute',
-                "right": "0.1rem",
-                "top": "0.1rem",
+                "width": '0.64rem',
+                "height": '0.64rem',
+                "background": '#4c3e36 url('+ closeimg + ') no-repeat',
+                'background-size': '100%',
+                "margin-right": "4%",
                 "border-radius":"50%",
-                "font-size":"0.3rem",
-                "color":"#aaa"
+                "z-index":100
             }
         });
-        $colsed.append("<strong style='background: #777;'>x</strong>")
         $footer.append($colsed);
-        $footer.on("click", ".downclose", function () {
+        $footer.on("click", "#downclose", function () {
             $(this).parent().hide();
         })
         $('html').append($footer);
@@ -81,5 +72,5 @@
     }
 
 
-})();
+})(Zepto);
 
