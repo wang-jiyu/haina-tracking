@@ -37,7 +37,6 @@
         xFetch.prototype.request = function ({ url, method, params, options } = config) {
             return new Promise((resolve, reject) => {
                 try {
-                    console.log(this.initConfig)
                     let realoptions = this.initConfig(url, method, params, options)
                     realoptions = Object.assign(realoptions, {
                         success: (data) => {
@@ -47,7 +46,6 @@
                             reject(xhr, type)
                         }
                     })
-                    console.log(realoptions)
                     $.ajax(realoptions)
                 } catch (err) {
                     reject(err)
@@ -85,10 +83,10 @@
 
     var HNtrack = (function () {
         let pageViewMap = {
-            '/mine/order/orderDetails':{
-                "1":"DZFOrder_Detail_Enter",
-                "2":"YZFOrder_Detail_Enter",
-                "3":"YQXOrder_Detail_Enter"
+            '/mine/order/orderDetails': {
+                "1": "DZFOrder_Detail_Enter",
+                "2": "YZFOrder_Detail_Enter",
+                "3": "YQXOrder_Detail_Enter"
             }
         }
         function HNtrack(config) {
@@ -138,7 +136,7 @@
             //     ip:"192.168.3.93",
             //     agent:"Hayner"
             // }),"www.9086")==="fdyG6YwtU/JsfyxKxad4zNE3RYxBKwK7WvXgcSWsbNaNuZ/mswFNyoKgz8mUCMJyddcVjo2C8uWQOqlZdijD7r5X2KrD5a9afcFlBIJ3rm/xTtga6hss5XnlMbD6u+ulbH8sSsWneMzRN0WMQSsCu1r14HElrGzWjbmf5rMBTcqCoM/JlAjCcvKzWfSeWXYMPsAT/qcJTrqIT/tPnhyT2ZWKhen1uh6YPgsUCSjWHxdTLVxOw+WCv8aISujooTRXQekzrAckXlN91fRtNj1RO2tw4tELBskaAZWlMXfox7eWQfeiNHMmROpd+2cS7S/evc6AD20SqDAsiteVzyVHdY/diizfTEdoXlYQcXWv30s=")
-            
+
             this.init(config)
         };
         HNtrack.prototype.init = function (config) {
@@ -155,7 +153,7 @@
             } else {
                 this.customTrack()
             }
-
+            this.pageView()
             //设置用户属性
             //设置页面来源referrer: document.referrer单页面有问题
             //自定义事件追踪
@@ -239,7 +237,7 @@
                     delete window['getRequestHead'];
                     try {
                         let json = result
-                        if(typeof json === 'string'){
+                        if (typeof json === 'string') {
                             json = JSON.parse(json)
                         }
                         this.getHeadEvent = json.headEvents
@@ -275,7 +273,6 @@
                         userId: ''
                     }
                 })
-                console.log(this.config)
                 this.getHeadEvent = this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
             }
         };
@@ -283,22 +280,27 @@
             var ua = window.navigator.userAgent.toLowerCase();
             return ua.indexOf('hayner') > 1
         };
-        HNtrack.prototype.singlepageView = function(url){
-            window.addEventListener("onpageshow",()=>{
-                let eventId = ""
-                let pathname =  window.location.pathname
-                let search  = window.location.search
-                let modulestr = pageViewMap[pathname]
-                if(typeof modulestr === 'object'){
-                    if(pathname==='/mine/order/orderDetails')
-                    modulestr = modulestr[]
+        HNtrack.prototype.pageView = function (url) {
+            let _this = this
+            window.onpageshow = function (event) {
+                let pathname = window.location.pathname
+                let search = window.location.search
+                let eventId = pageViewMap[pathname]||'MOBILE_PV_ENTER'
+                if (typeof eventId === 'object') {
+                    switch (pathname) {
+                        case '/mine/order/orderDetails':
+                            eventId = eventId[$.getQuertString("orderStatus")]
+                            break;
+                        default:
+                            eventId = 'MOBILE_PV_ENTER'
+                    }
                 }
-                this.HttpIntance.post('/appevent.jspa', { eventId, parameter:"", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"),userId:this.userId }, {
+                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
                     headers: {
-                        headerEvent: this.getHeadEvent
+                        headerEvent: _this.getHeadEvent
                     }
                 })
-            })
+            }
         }
         HNtrack.prototype.customTrack = function () {
             let _this = this
@@ -306,7 +308,7 @@
             $(document).on("click", "[data-eventid]", function (e) {
                 let eventId = $(this).data("eventid")
                 let parameter = {}
-                $(this).data("parameter")&&$(this).data("parameter").split(",").forEach(element => {
+                $(this).data("parameter") && $(this).data("parameter").split(",").forEach(element => {
                     let temp = element.split(":")
                     if (temp && temp.length > 0) {
                         parameter[temp[0]] = temp[1]
@@ -315,7 +317,7 @@
                 });
                 parameter = JSON.stringify(parameter)
 
-                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"),userId:_this.userId }, {
+                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
                     headers: {
                         headerEvent: _this.getHeadEvent
                     }
@@ -346,7 +348,7 @@
         };
         HNtrack.prototype.server_config = function () {
             let env = 'production'
-            if (window.location.hostname.split('.').length > 0&&!(window.location.hostname.indexOf("localhost") > -1)) {
+            if (window.location.hostname.split('.').length > 0 && !(window.location.hostname.indexOf("localhost") > -1)) {
                 let hostname = window.location.hostname.split('.')[0]
                 if (hostname.indexOf("-") > -1) {
                     env = hostname.substring(hostname.indexOf("-") + 1)

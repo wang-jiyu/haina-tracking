@@ -1,7 +1,7 @@
 /**
  * Created by Administrator on 2017/10/24 0024.
  */
-; (function () {
+;(function () {
     var ua = window.navigator.userAgent.toLowerCase();
 
     function _IsInApp() {
@@ -70,13 +70,13 @@
         })
         $('html').append($footer);
     }
-    function getQuertString(key) {
+    $.getQuertString = function (key) {
         let reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
         let r = window.location.search.substr(1).match(reg);
         if (r != null) return decodeURI(r[2]);
         return null;
     }
-    if (!_IsInApp() && getQuertString("sharefrom") === 'hayner') {
+    if (!_IsInApp() && $.getQuertString("sharefrom") === 'hayner') {
         generaterFooter()
     }
 
