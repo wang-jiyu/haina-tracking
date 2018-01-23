@@ -363,7 +363,5 @@
     }())
 
     window.HNtrack = HNtrack
-
-    new HNtrack()
 })(Zepto)
 
