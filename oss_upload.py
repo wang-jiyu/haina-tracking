@@ -11,7 +11,7 @@ class OSS_resouce(object):
 
     def bin_upload_files(self):
         self.bucket = oss2.Bucket(self.auth, 'http://oss-cn-beijing.aliyuncs.com', 'hn-web')
-        self.file_list = os.listdir('./dist2.1')
+        self.file_list = os.listdir('./dist')
         for file in self.file_list:
             if os.path.exists(file):
             	# print 'aaa'
