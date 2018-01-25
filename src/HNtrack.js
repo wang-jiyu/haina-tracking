@@ -17,7 +17,9 @@
         return fmt;
     }
 
-
+    window.onerror = function(msg,url,l){
+        console.log(msg,url,l)
+    }
     var xFetch = /** @class */ (function () {
         function xFetch(base_url, callback_timeout) {
             this.base_url = base_url;
@@ -48,6 +50,7 @@
                     })
                     $.ajax(realoptions)
                 } catch (err) {
+                    console.log('服务端返回异常')
                     reject(err)
                 }
             })
@@ -247,18 +250,32 @@
                             console.log(e);
                         }
                     }
-                    if (typeof window['webkit'] != 'undefined') {
-                        const realParam = {
-                            "nativeCallJS": "getRequestHead"
+                    if (window['haina'] && window['haina'].pushEvent) {
+                        if (typeof window['webkit'] != 'undefined') {
+                            const realParam = {
+                                "nativeCallJS": "getRequestHead"
+                            }
+                            window['webkit'].messageHandlers.jsCallNative.postMessage(realParam);
+                        } else if (/Android/i.test(window.navigator.userAgent)) {
+                            const realParam = {
+                                "nativecalljs": "getRequestHead"
+                            }
+                            const paramstr = JSON.stringify(realParam)
+                            window['haina'].pushEvent(paramstr);
                         }
-                        window['webkit'].messageHandlers.jsCallNative.postMessage(realParam);
-                    } else if (/Android/i.test(window.navigator.userAgent)) {
-                        const realParam = {
-                            "nativecalljs": "getRequestHead"
+                    } else {
+                        if (typeof window.webkit != 'undefined') {
+                            //ios
+                            window.webkit.messageHandlers.jsCallNative.postMessage({
+                                "jsCallNative": "getRequestHead"
+                            });
+                        } else {
+                            //android
+                            window.android.getRequestHead();
+
                         }
-                        const paramstr = JSON.stringify(realParam)
-                        window['haina'].pushEvent(paramstr);
                     }
+
                 } else {
                     Object.assign(this.config, {
                         data: {
@@ -287,47 +304,55 @@
         HNtrack.prototype.pageView = function (url) {
             let _this = this
             window.onpageshow = function (event) {
-                let pathname = window.location.pathname
-                let search = window.location.search
-                let eventId = pageViewMap[pathname] || 'MOBILE_PV_ENTER'
-                if (typeof eventId === 'object') {
-                    switch (pathname) {
-                        case '/mine/order/orderDetails':
-                            eventId = eventId[$.getQuertString("orderStatus")]
-                            break;
-                        default:
-                            eventId = 'MOBILE_PV_ENTER'
+                try {
+                    let pathname = window.location.pathname
+                    let search = window.location.search
+                    let eventId = pageViewMap[pathname] || 'MOBILE_PV_ENTER'
+                    if (typeof eventId === 'object') {
+                        switch (pathname) {
+                            case '/mine/order/orderDetails':
+                                eventId = eventId[$.getQuertString("orderStatus")]
+                                break;
+                            default:
+                                eventId = 'MOBILE_PV_ENTER'
+                        }
                     }
+                    _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
+                        headers: {
+                            headerEvent: _this.getHeadEvent
+                        }
+                    })
+                } catch (error) {
+                    console.log(error)
                 }
-                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
-                    headers: {
-                        headerEvent: _this.getHeadEvent
-                    }
-                })
             }
         }
         HNtrack.prototype.customTrack = function () {
-            let _this = this
-            $(document).off("click", "[data-eventid]")
-            $(document).on("click", "[data-eventid]", function (e) {
-                let eventId = $(this).data("eventid")
-                let parameter = {}
-                $(this).data("parameter") && $(this).data("parameter").split(",").forEach(element => {
-                    let temp = element.split(":")
-                    if (temp && temp.length > 0) {
-                        parameter[temp[0]] = temp[1]
-                    }
+            try {
+                let _this = this
+                $(document).off("click", "[data-eventid]")
+                $(document).on("click", "[data-eventid]", function (e) {
+                    let eventId = $(this).data("eventid")
+                    let parameter = {}
+                    $(this).data("parameter") && $(this).data("parameter").split(",").forEach(element => {
+                        let temp = element.split(":")
+                        if (temp && temp.length > 0) {
+                            parameter[temp[0]] = temp[1]
+                        }
 
-                });
-                parameter = JSON.stringify(parameter)
+                    });
+                    parameter = JSON.stringify(parameter)
 
-                _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
-                    headers: {
-                        headerEvent: _this.getHeadEvent
-                    }
+                    _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
+                        headers: {
+                            headerEvent: _this.getHeadEvent
+                        }
+                    })
+
                 })
-
-            })
+            } catch (error) {
+                console.log(error)
+            }
         };
         HNtrack.prototype.autoTrack = function () {
             let aList = $("a")

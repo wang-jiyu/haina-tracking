@@ -67,7 +67,7 @@
         if (r != null) return decodeURI(r[2]);
         return null;
     }
-    if (!_IsInApp() && $.getQuertString("sharefrom") === 'hayner') {
+    if (!_IsInApp() && $.getQuertString("innerapp") === 'hayner') {
         generaterFooter()
     }
 
