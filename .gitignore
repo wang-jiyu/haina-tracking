@@ -1,2 +1,5 @@
 node_modules
 dist
+dist2.1
+oss_upload.py
+.vscode

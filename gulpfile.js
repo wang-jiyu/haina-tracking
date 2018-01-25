@@ -16,18 +16,15 @@ gulp.task("lib", function () {
         }))
         .pipe(uglify())
         .pipe(gulp.dest('dist'))
-        .pipe(gzip({threshold: 10240,minRatio:0.8}))
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('../haina-mobile/assets/js'))
 })
 
 gulp.task("lib-2.1", function () {
     gulp.src(['src/zepto.js','src/download.js'])
-        .pipe(concat(`hntrack_${version}.js`))
+        .pipe(concat(`hntrack_0.0.2.js`))
         .pipe(babel({
             presets:['es2015','stage-0']
         }))
         .pipe(uglify())
-        .pipe(gulp.dest('dist'))
-        .pipe(gzip({threshold: 10240,minRatio:0.8}))
-        .pipe(gulp.dest('dist'));
+        .pipe(gulp.dest('dist2.1'))
 })
