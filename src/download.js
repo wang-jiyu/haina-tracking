@@ -10,7 +10,7 @@
     function generaterFooter() {
         let downLoadImgUrl = 'https://content.0606.com.cn/m/assets/img/pic_bg.png'
         let $footer = $('<div />', {
-            "id":"downloadApp",
+            "id":"haina-track-downloadApp",
             "css": {
                 'position': 'fixed',
                 "display":"flex",
@@ -27,7 +27,7 @@
             }
         })
         let $a = $('<a />', {
-            "class": "download",
+            "class": "haina-track-download",
             "css": {
                 "position": "absolute",
                 "top":0,
@@ -39,12 +39,12 @@
             }
         })
         $footer.append($a)
-        $footer.on("click", ".download", function () {
+        $footer.on("click", ".haina-track-download", function () {
             window.location = 'http://a.app.qq.com/o/simple.jsp?pkgname=com.sz.nniu';
         })
         let closeimg = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABABAMAAABYR2ztAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAVUExURf///0xpcf///////////////////ybWoNgAAAAHdFJOUx8A0g9czVgR5p0BAAABIklEQVRIx5WWTQ6CMBCFnym61nCDRvclXIBwAuPCtRvvfwX7RzqFaV+chGCcL483pZ0BNxHjDB/zJP+DSDvkMCowQsR0BKq8IKDnC7EBOEQNuCNgJDBCiUkATgNMAVSBLIGmQJZAWyBJoC2QJKCugVgLf13bwCkCrg2YCAC9Z6BdQ6oDPQvBBHoWggl0LXgTEvgu6T68JVA8Xl739GN9fIpLFI9na6PEYO2zuBSAT0SJNYMZEEWkzMblMiSQUpVADcRcLeABGSFZC+zDZ2uBfQwBWHoru/YFOEAfwUyqZdKF+mep9ZdFXzfdMHTL0U3Ltz09OPTo0cNLjz9vILQF0SbG2yBtpLQV82ZOxwEfKHQk8aHGxyIdrHw0S6f6cG98HvwAODk7pTzy15gAAAAASUVORK5CYII='
         let $colsed = $("<div />", {
-            "id": "downclose",
+            "id": "haina-track-downclose",
             "css": {
                 "width": '0.64rem',
                 "height": '0.64rem',
@@ -56,7 +56,7 @@
             }
         });
         $footer.append($colsed);
-        $footer.on("click", "#downclose", function () {
+        $footer.on("click", "#haina-track-downclose", function () {
             $(this).parent().hide();
         })
         $('html').append($footer);
