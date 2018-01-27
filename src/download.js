@@ -22,8 +22,18 @@
                 'width': '100%',
                 'height': "1.2rem",
                 'z-index': 99,
-                'background': 'url(' + downLoadImgUrl + ')',
-                'background-size': '100%'
+                'background-image': 'url(' + downLoadImgUrl + ')',
+                'background-size': '100% 100%' 
+            }
+        })
+        let img = $("<img />",{
+            "src":downLoadImgUrl,
+            "css":{
+                "position": "absolute",
+                "top":0,
+                "left":0,
+                "width": "100%",
+                "height": "100%",
             }
         })
         let $a = $('<a />', {

@@ -13,9 +13,9 @@ class OSS_resouce(object):
         self.bucket = oss2.Bucket(self.auth, 'http://oss-cn-beijing.aliyuncs.com', 'hn-web')
         self.file_list = os.listdir('./dist')
         for file in self.file_list:
-            if os.path.exists(file):
-            	# print 'aaa'
-                self.bucket.put_object_from_file('web/js/{remote_file}'.format(remote_file = file),'{local_name}'.format(local_name = file))
+            if os.path.exists('./dist/'+file):
+                print file
+                self.bucket.put_object_from_file('web/js/{remote_file}'.format(remote_file = file),'{local_name}'.format(local_name = './dist/'+file))
 
         print 'update '+str(len(self.file_list))+' files'
 if __name__ == '__main__':
