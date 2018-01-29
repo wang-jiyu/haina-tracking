@@ -17,8 +17,8 @@
         return fmt;
     }
 
-    window.onerror = function(msg,url,l){
-        console.log(msg,url,l)
+    window.onerror = function (msg, url, l) {
+        console.log(msg, url, l)
     }
     var xFetch = /** @class */ (function () {
         function xFetch(base_url, callback_timeout) {
@@ -250,29 +250,31 @@
                             console.log(e);
                         }
                     }
-                    if (window['haina'] && window['haina'].pushEvent) {
-                        if (typeof window['webkit'] != 'undefined') {
-                            const realParam = {
-                                "nativeCallJS": "getRequestHead"
-                            }
-                            window['webkit'].messageHandlers.jsCallNative.postMessage(realParam);
-                        } else if (/Android/i.test(window.navigator.userAgent)) {
-                            const realParam = {
-                                "nativecalljs": "getRequestHead"
-                            }
-                            const paramstr = JSON.stringify(realParam)
-                            window['haina'].pushEvent(paramstr);
+                    if (typeof window['webkit'] != 'undefined') {
+                        console.log("<<<<<<<<<<<<<<<<<ios获取head")
+                        const realParam = {
+                            "nativeCallJS": "getRequestHead"
                         }
-                    } else {
+                        window['webkit'].messageHandlers.jsCallNative.postMessage(realParam);
+                    } else if (/Android/i.test(window.navigator.userAgent)) {
+                        console.log("<<<<<<<<<<<<<<<<<android获取head")
+                        const realParam = {
+                            "nativecalljs": "getRequestHead"
+                        }
+                        const paramstr = JSON.stringify(realParam)
+                        window['haina'].pushEvent(paramstr);
+                    }
+                    if(window.location.href.indexOf("web-test.0606.com.cn/tool.html")>-1||window.location.href.indexOf("web.0606.com.cn/tool.html")>-1){
                         if (typeof window.webkit != 'undefined') {
                             //ios
+                            console.log("old<<<<<<<<<<<<<<<<<ios获取head")
                             window.webkit.messageHandlers.jsCallNative.postMessage({
                                 "jsCallNative": "getRequestHead"
                             });
                         } else {
                             //android
+                            console.log("old<<<<<<<<<<<<<<<<<android获取head")
                             window.android.getRequestHead();
-
                         }
                     }
 
@@ -294,7 +296,7 @@
                     this.getHeadEvent = this.encryptByDES(JSON.stringify(this.config.data), "www.9086")
                 }
             } catch (error) {
-                console.log(error)
+                console.log("获取原生头部信息错误")
             }
         };
         HNtrack.prototype.isApp = function () {
@@ -326,6 +328,15 @@
                     console.log(error)
                 }
             }
+        }
+        HNtrack.prototype.handleTrack = function (eventId, parameter) {
+            parameter = JSON.stringify(parameter)
+
+            this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: this.userId }, {
+                headers: {
+                    headerEvent: this.getHeadEvent
+                }
+            })
         }
         HNtrack.prototype.customTrack = function () {
             try {

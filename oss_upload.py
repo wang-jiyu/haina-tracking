@@ -15,7 +15,7 @@ class OSS_resouce(object):
         for file in self.file_list:
             if os.path.exists('./dist/'+file):
                 print file
-                self.bucket.put_object_from_file('web/js/{remote_file}'.format(remote_file = file),'{local_name}'.format(local_name = './dist/'+file))
+                self.bucket.put_object_from_file('mtest/assets/js/{remote_file}'.format(remote_file = file),'{local_name}'.format(local_name = './dist/'+file))
 
         print 'update '+str(len(self.file_list))+' files'
 if __name__ == '__main__':
