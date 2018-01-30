@@ -94,7 +94,7 @@
         }
         function HNtrack(config) {
             this.url = {
-                production: 'https://stat.0606.com.cn/stat',
+                production: 'https://stat2.0606.com.cn/stat',
                 test: 'https://stat-test.0606.com.cn/stat',
                 test2: 'https://stat-test.0606.com.cn/stat',
                 dev1: 'http://stat-test.0606.com.cn/stat',
