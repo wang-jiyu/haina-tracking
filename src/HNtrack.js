@@ -305,7 +305,7 @@
         };
         HNtrack.prototype.pageView = function (url) {
             let _this = this
-            window.onpageshow = function (event) {
+            window.onload = function (event) {
                 try {
                     let pathname = window.location.pathname
                     let search = window.location.search
