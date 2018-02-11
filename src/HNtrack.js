@@ -29,7 +29,7 @@
             let realoptions = {
                 type: method,
                 url: `${this.base_url}${url}`,
-                data: JSON.stringify(params),
+                data: method==='get'?params:JSON.stringify(params),
                 contentType: 'application/json;charset=utf-8',
                 timeout: this.callback_timeout,
                 ...options
@@ -84,6 +84,7 @@
         return xFetch;
     }());
 
+    window.xFetch = new xFetch('')
     var HNtrack = (function () {
         let pageViewMap = {
             '/mine/order/orderDetails': {
