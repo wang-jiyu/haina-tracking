@@ -16,10 +16,6 @@
             if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
         return fmt;
     }
-
-    window.onerror = function (msg, url, l) {
-        console.log(msg, url, l)
-    }
     var xFetch = /** @class */ (function () {
         function xFetch(base_url, callback_timeout) {
             this.base_url = base_url;
