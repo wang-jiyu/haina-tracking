@@ -235,7 +235,6 @@
             try {
                 if (this.isApp()) {
                     window['getRequestHead'] = (result) => {
-                        delete window['getRequestHead'];
                         try {
                             let json = result
                             if (typeof json === 'string') {

@@ -3,7 +3,7 @@
  */
 ;(function ($) {
     var ua = window.navigator.userAgent.toLowerCase();
-
+    var dpr = document.documentElement.dataset.dpr || window.devicePixelRatio
     function _IsInApp() {
         return ua.indexOf('hayner') > 1;
     }
@@ -20,7 +20,7 @@
                 'right':0,
                 'bottom': 0,
                 'width': '100%',
-                'height': "1.2rem",
+                'height': 60*dpr,
                 'z-index': 99,
                 'background-image': 'url(' + downLoadImgUrl + ')',
                 'background-size': '100% 100%' 
@@ -56,8 +56,8 @@
         let $colsed = $("<div />", {
             "id": "haina-track-downclose",
             "css": {
-                "width": '0.64rem',
-                "height": '0.64rem',
+                "width": 32*dpr,
+                "height": 32*dpr,
                 "background": '#4c3e36 url('+ closeimg + ') no-repeat',
                 'background-size': '100%',
                 "margin-right": "4%",
