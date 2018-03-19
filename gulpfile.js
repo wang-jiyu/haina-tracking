@@ -7,7 +7,7 @@ const uglify = require('gulp-uglify');
 const gzip = require('gulp-gzip');
 // const { haina_data_tracking_version } = require('./version')
 
-const version = '1.0.2'
+const version = '1.0.3'
 gulp.task("lib", function () {
     gulp.src(['src/zepto.js','src/download.js','src/tripledes.js','src/mode-ecb.js','src/HNtrack.js'])
         .pipe(concat(`hntrack_${version}.js`))
