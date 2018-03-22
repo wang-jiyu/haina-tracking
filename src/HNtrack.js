@@ -25,7 +25,7 @@
             let realoptions = {
                 type: method,
                 url: `${this.base_url}${url}`,
-                data: method==='get'?params:JSON.stringify(params),
+                data: method === 'get' ? params : JSON.stringify(params),
                 contentType: 'application/json;charset=utf-8',
                 timeout: this.callback_timeout,
                 ...options
@@ -35,16 +35,27 @@
         xFetch.prototype.request = function ({ url, method, params, options } = config) {
             return new Promise((resolve, reject) => {
                 try {
-                    let realoptions = this.initConfig(url, method, params, options)
-                    realoptions = Object.assign(realoptions, {
-                        success: (data) => {
-                            resolve(data)
-                        },
-                        error: (xhr, type) => {
-                            reject(xhr, type)
-                        }
-                    })
-                    $.ajax(realoptions)
+                    if (method === 'get') {
+                        $.get(url, params, (data, status) => {
+                            if (status > 300) {
+                                reject(data)
+                            } else {
+                                resolve(data)
+                            }
+                        })
+                    } else {
+                        let realoptions = this.initConfig(url, method, params, options)
+                        realoptions = Object.assign(realoptions, {
+                            success: (data) => {
+                                resolve(data)
+                            },
+                            error: (xhr, type) => {
+                                reject(xhr, type)
+                            }
+                        })
+                        $.ajax(realoptions)
+                    }
+
                 } catch (err) {
                     console.log('服务端返回异常')
                     reject(err)
@@ -87,6 +98,13 @@
                 "1": "DZFOrder_Detail_Enter",
                 "2": "YZFOrder_Detail_Enter",
                 "3": "YQXOrder_Detail_Enter"
+            },
+            '/news/information': {
+                "homerecommend": "HQ_XW_Detail_Leave"
+            },
+            '/news/information/newsDetails': {
+                "notice": "HQ_GG_Detail_Leave",
+                "researchReport": "HQ_YB_Detail_Leave"
             }
         }
         function HNtrack(config) {
@@ -240,13 +258,14 @@
                             if (typeof json === 'string') {
                                 json = JSON.parse(json)
                             }
+                            console.log("getRequestHead-back",json)
                             this.getHeadEvent = json.headEvents
                             this.userId = json.userId
                         } catch (e) {
                             console.log(e);
                         }
                     }
-                    if (typeof window['webkit'] != 'undefined') {
+                    if (window.navigator.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
                         console.log("<<<<<<<<<<<<<<<<<ios获取head")
                         const realParam = {
                             "nativeCallJS": "getRequestHead"
@@ -260,7 +279,7 @@
                         const paramstr = JSON.stringify(realParam)
                         window['haina'].pushEvent(paramstr);
                     }
-                    if(window.location.href.indexOf("web-test.0606.com.cn/tool.html")>-1||window.location.href.indexOf("web.0606.com.cn/tool.html")>-1){
+                    if (window.location.href.indexOf("web-test.0606.com.cn/tool.html") > -1 || window.location.href.indexOf("web.0606.com.cn/tool.html") > -1) {
                         if (typeof window.webkit != 'undefined') {
                             //ios
                             console.log("old<<<<<<<<<<<<<<<<<ios获取head")
@@ -278,7 +297,7 @@
                     Object.assign(this.config, {
                         data: {
                             agent: this.getAgent(),
-                            idfa: '',
+                            idfa: 'haina-h5-9086',
                             appVersion: '',
                             mobileType: this.getMobileType(),
                             channel: '',
@@ -303,23 +322,85 @@
             let _this = this
             window.onload = function (event) {
                 try {
+                    window["haina-page-view-start"] = new Date()
                     let pathname = window.location.pathname
                     let search = window.location.search
-                    let eventId = pageViewMap[pathname] || 'MOBILE_PV_ENTER'
+                    let eventId = pageViewMap[pathname] || ''
                     if (typeof eventId === 'object') {
                         switch (pathname) {
                             case '/mine/order/orderDetails':
                                 eventId = eventId[$.getQuertString("orderStatus")]
                                 break;
                             default:
-                                eventId = 'MOBILE_PV_ENTER'
+                                eventId = ''
                         }
                     }
-                    _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
-                        headers: {
-                            headerEvent: _this.getHeadEvent
+                    if (eventId !== '') {
+                        _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
+                            headers: {
+                                headerEvent: _this.getHeadEvent
+                            }
+                        })
+                    }
+                    // 在页面关闭前,调用sa的track方法
+                    window.onunload = function () {
+                        let end = new Date();
+                        let unpath = window.location.pathname
+                        // if(unpath.indexOf("/preload")>-1){
+                        //     unpath = $.getQuertString("hainapreview")
+                        // }
+                        let eventIdss = pageViewMap[unpath] || ''
+                        let parameter = ""
+
+                        // 如果用户一直不关闭页面，可能出现超大值，可以根据业务需要处理，例如设置一个上限
+                        let duration = (end.getTime() - window["haina-page-view-start"].getTime());
+                        if (typeof eventIdss === 'object') {
+                            switch (unpath) {
+                                case '/news/information':
+                                    if ($.getQuertString("module") === 'homerecommend') {
+                                        eventIdss = eventIdss[$.getQuertString("module")]
+                                        parameter = {
+                                            newsId: $.getQuertString("newsId"), timeSpent: duration
+                                        }
+                                    }else {
+                                        eventIdss = ''
+                                    }
+
+                                    break;
+                                case '/news/information/newsDetails':
+                                    
+                                    if ($.getQuertString("module") === 'notice') {
+                                        eventIdss = eventIdss[$.getQuertString("module")]
+                                        parameter = {
+                                            reportId: $.getQuertString("newsId"), timeSpent: duration
+                                        }
+                                    } else if ($.getQuertString("module") === 'researchReport') {
+                                        eventIdss = eventIdss[$.getQuertString("module")]
+                                        parameter = {
+                                            researchId: $.getQuertString("newsId"), timeSpent: duration
+                                        }
+                                    }else{
+                                        eventIdss = ''
+                                    }
+
+                                    break;
+                                default:
+                                    eventIdss = ''
+                            }
                         }
-                    })
+                        // 定义一个记录页面停留时间的事件pageView,并且保存需要的属性(停留时间和当前页面的地址)
+                        console.log("duration>>>>>>>>>>>>>>", duration)
+                        console.log("eventIdss>>>>>>>>>>>>>>", eventIdss)
+                        console.log("parameter>>>>>>>>>>>>>>", parameter)
+                        if(eventIdss!==''){
+                            _this.HttpIntance.post('/appevent.jspa', { eventId: eventIdss, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
+                                headers: {
+                                    headerEvent: _this.getHeadEvent
+                                },
+                                async:false
+                            })
+                        }
+                    }
                 } catch (error) {
                     console.log(error)
                 }
