@@ -107,6 +107,9 @@
                 "researchReport": "HQ_YB_Detail_Leave"
             }
         }
+        let enterWhiteList = [
+            '/quickLogin'
+        ]
         function HNtrack(config) {
             this.url = {
                 production: 'https://stat2.0606.com.cn/stat',
@@ -265,7 +268,7 @@
                             console.log(e);
                         }
                     }
-                    if (window.navigator.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
+                    if (typeof window['webkit'] != 'undefined') {
                         console.log("<<<<<<<<<<<<<<<<<ios获取head")
                         const realParam = {
                             "nativeCallJS": "getRequestHead"
@@ -334,6 +337,9 @@
                             default:
                                 eventId = ''
                         }
+                    }
+                    if(enterWhiteList.includes(pathname)){
+                        eventId = pathname
                     }
                     if (eventId !== '') {
                         _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
@@ -406,13 +412,13 @@
                 }
             }
         }
-        HNtrack.prototype.handleTrack = function (eventId, parameter) {
+        HNtrack.prototype.handleTrack = function (eventId, parameter,async=true) {
             parameter = JSON.stringify(parameter)
-
             this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: this.userId }, {
                 headers: {
                     headerEvent: this.getHeadEvent
-                }
+                },
+                async
             })
         }
         HNtrack.prototype.customTrack = function () {
@@ -430,11 +436,13 @@
 
                     });
                     parameter = JSON.stringify(parameter)
-
+                    let async = $(this).data("async")
+                    
                     _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
                         headers: {
                             headerEvent: _this.getHeadEvent
-                        }
+                        },
+                        async:!async
                     })
 
                 })
