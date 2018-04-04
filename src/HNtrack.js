@@ -339,7 +339,7 @@
                         }
                     }
                     if(enterWhiteList.includes(pathname)){
-                        eventId = pathname
+                        eventId = "PV_UV_ROUTER"+pathname.replace(/\//ig,"_").toUpperCase()
                     }
                     if (eventId !== '') {
                         _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
