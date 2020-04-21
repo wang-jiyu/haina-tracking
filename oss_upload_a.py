@@ -1,3 +1,10 @@
+'''
+@ Author: wangjiyu
+@Date: 2020-04-21 13:27:38
+@LastEditTime: 2020-04-21 13:29:36
+@LastEditors: wangjiyu
+@Description: file content
+'''
 #coding:utf-8
 from aliyunsdkcore.client import AcsClient
 from aliyunsdkcore.request import RpcRequest
@@ -7,10 +14,10 @@ import os
 
 class OSS_resouce(object):
     def __init__(self):
-        self.auth = oss2.Auth('LTAIPbl6650CGCWd','5bozPnpcPvquE5CtUTSz09KTGMLAv7')
+        self.auth = oss2.Auth('***','***')
 
     def bin_upload_files(self):
-        self.bucket = oss2.Bucket(self.auth, 'http://oss-cn-beijing.aliyuncs.com', 'hn-web')
+        self.bucket = oss2.Bucket(self.auth, 'http://oss-cn-beijing.aliyuncs.com', '***')
         for root, dirs, files in os.walk('assets', topdown=False):
             for name in files:
                 print os.path.join(root, name)
