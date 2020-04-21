@@ -1,5 +1,5 @@
 {
-  "name": "haina-tracking",
+  "name": "web-tracking",
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
@@ -8,9 +8,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@60.205.162.223:sunlandong/haina-tracking.git"
+    "url": ""
   },
-  "author": "sunlandong",
+  "author": "web",
   "license": "ISC",
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.38",

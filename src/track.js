@@ -92,7 +92,7 @@
     }());
 
     window.xFetch = new xFetch('')
-    var HNtrack = (function () {
+    var track = (function () {
         let pageViewMap = {
             '/mine/order/orderDetails': {
                 "1": "DZFOrder_Detail_Enter",
@@ -110,14 +110,14 @@
         let enterWhiteList = [
             '/quickLogin'
         ]
-        function HNtrack(config) {
+        function track(config) {
             this.url = {
-                production: 'https://stat2.0606.com.cn/stat',
-                test: 'https://stat-test.0606.com.cn/stat',
-                test2: 'https://stat-test.0606.com.cn/stat',
-                dev1: 'http://stat-test.0606.com.cn/stat',
-                dev2: 'http://stat-test.0606.com.cn/stat',
-                bug: 'https://stat-bug.0606.com.cn/stat',
+                production: 'https://stat2.1234.com.cn/stat',
+                test: 'https://stat-test.1234.com.cn/stat',
+                test2: 'https://stat-test.1234.com.cn/stat',
+                dev1: 'http://stat-test.1234.com.cn/stat',
+                dev2: 'http://stat-test.1234.com.cn/stat',
+                bug: 'https://stat-bug.1234.com.cn/stat',
                 development: '/track'
             }
             this.config = {
@@ -144,23 +144,10 @@
             }
 
             this.appVersion = window.navigator.appVersion
-            // console.log(encryptByDES(JSON.stringify({
-            //     idfa:"72CD2664-E27A-451B-BC52-6654EDC44AD1",
-            //     appVersion:"2.2.0",
-            //     netEnvType:"wi-fi",
-            //     imei:"72CD2664-E27A-451B-BC52-6654EDC44AD1",
-            //     osVersion:"11.2",
-            //     channel:"appStore",
-            //     userId:"",
-            //     manufacturer:"Apple",
-            //     mobileType:"iOS",
-            //     ip:"192.168.3.93",
-            //     agent:"Hayner"
-            // }),"www.9086")==="fdyG6YwtU/JsfyxKxad4zNE3RYxBKwK7WvXgcSWsbNaNuZ/mswFNyoKgz8mUCMJyddcVjo2C8uWQOqlZdijD7r5X2KrD5a9afcFlBIJ3rm/xTtga6hss5XnlMbD6u+ulbH8sSsWneMzRN0WMQSsCu1r14HElrGzWjbmf5rMBTcqCoM/JlAjCcvKzWfSeWXYMPsAT/qcJTrqIT/tPnhyT2ZWKhen1uh6YPgsUCSjWHxdTLVxOw+WCv8aISujooTRXQekzrAckXlN91fRtNj1RO2tw4tELBskaAZWlMXfox7eWQfeiNHMmROpd+2cS7S/evc6AD20SqDAsiteVzyVHdY/diizfTEdoXlYQcXWv30s=")
 
             this.init(config)
         };
-        HNtrack.prototype.init = function (config) {
+        track.prototype.init = function (config) {
             this.initHeader()
             this.config = Object.assign({}, this.config, config)
             this.HttpIntance = new xFetch(this.config.server_url, this.config.callback_timeout)
@@ -182,7 +169,7 @@
             //页面访问pv，uv,单页面应用有问题
 
         };
-        HNtrack.prototype.encryptByDES = function (message, key) {
+        track.prototype.encryptByDES = function (message, key) {
             var keyHex = CryptoJS.enc.Utf8.parse(key);
             var encrypted = CryptoJS.DES.encrypt(message, keyHex, {
                 mode: CryptoJS.mode.ECB,
@@ -190,7 +177,7 @@
             });
             return encrypted.toString();
         }
-        HNtrack.prototype.getAgent = function () {
+        track.prototype.getAgent = function () {
             try {
                 let app = this.appVersion
                 let start = app.lastIndexOf(" ")
@@ -200,14 +187,14 @@
                 console.log('agent get error')
             }
         }
-        HNtrack.prototype.getMobileType = function () {
+        track.prototype.getMobileType = function () {
             if (this.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
                 return 'IOS'
             } else {
                 return 'Android'
             }
         }
-        HNtrack.prototype.getOsVersion = function () {
+        track.prototype.getOsVersion = function () {
             try {
                 if (this.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
                     let ios = this.appVersion.match(/OS (\d+_)*(\d+)/gi)[0]
@@ -226,7 +213,7 @@
                 console.log('osversion get error')
             }
         }
-        HNtrack.prototype.getManufacturer = function () {
+        track.prototype.getManufacturer = function () {
             try {
                 if (this.appVersion.match(/iphone|iPad|iPod|iOS/gi)) {
 
@@ -245,14 +232,14 @@
                 console.log('manufacturer get error')
             }
         }
-        HNtrack.prototype.getNetEnvType = function () {
+        track.prototype.getNetEnvType = function () {
             try {
                 return window.navigator.connection && window.navigator.connection.effectiveType
             } catch (error) {
                 console.log('NetEnvType get error')
             }
         }
-        HNtrack.prototype.initHeader = function () {
+        track.prototype.initHeader = function () {
             try {
                 if (this.isApp()) {
                     window['getRequestHead'] = (result) => {
@@ -261,7 +248,7 @@
                             if (typeof json === 'string') {
                                 json = JSON.parse(json)
                             }
-                            console.log("getRequestHead-back",json)
+                            console.log("getRequestHead-back", json)
                             this.getHeadEvent = json.headEvents
                             this.userId = json.userId
                         } catch (e) {
@@ -280,9 +267,9 @@
                             "nativecalljs": "getRequestHead"
                         }
                         const paramstr = JSON.stringify(realParam)
-                        window['haina'].pushEvent(paramstr);
+                        window['asdf'].pushEvent(paramstr);
                     }
-                    if (window.location.href.indexOf("web-test.0606.com.cn/tool.html") > -1 || window.location.href.indexOf("web.0606.com.cn/tool.html") > -1) {
+                    if (window.location.href.indexOf("web-test.1234.com.cn/tool.html") > -1 || window.location.href.indexOf("web.1234.com.cn/tool.html") > -1) {
                         if (typeof window.webkit != 'undefined') {
                             //ios
                             console.log("old<<<<<<<<<<<<<<<<<ios获取head")
@@ -300,7 +287,7 @@
                     Object.assign(this.config, {
                         data: {
                             agent: this.getAgent(),
-                            idfa: 'haina-h5-9086',
+                            idfa: 'web-h5-9086',
                             appVersion: '',
                             mobileType: this.getMobileType(),
                             channel: '',
@@ -317,15 +304,15 @@
                 console.log("获取原生头部信息错误")
             }
         };
-        HNtrack.prototype.isApp = function () {
+        track.prototype.isApp = function () {
             var ua = window.navigator.userAgent.toLowerCase();
             return ua.indexOf('hayner') > 1
         };
-        HNtrack.prototype.pageView = function (url) {
+        track.prototype.pageView = function (url) {
             let _this = this
             window.onload = function (event) {
                 try {
-                    window["haina-page-view-start"] = new Date()
+                    window["web-page-view-start"] = new Date()
                     let pathname = window.location.pathname
                     let search = window.location.search
                     let eventId = pageViewMap[pathname] || ''
@@ -338,8 +325,8 @@
                                 eventId = ''
                         }
                     }
-                    if(enterWhiteList.includes(pathname)){
-                        eventId = "PV_UV_ROUTER"+pathname.replace(/\//ig,"_").toUpperCase()
+                    if (enterWhiteList.includes(pathname)) {
+                        eventId = "PV_UV_ROUTER" + pathname.replace(/\//ig, "_").toUpperCase()
                     }
                     if (eventId !== '') {
                         _this.HttpIntance.post('/appevent.jspa', { eventId, parameter: "", eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
@@ -359,7 +346,7 @@
                         let parameter = ""
 
                         // 如果用户一直不关闭页面，可能出现超大值，可以根据业务需要处理，例如设置一个上限
-                        let duration = (end.getTime() - window["haina-page-view-start"].getTime());
+                        let duration = (end.getTime() - window["web-page-view-start"].getTime());
                         if (typeof eventIdss === 'object') {
                             switch (unpath) {
                                 case '/news/information':
@@ -368,13 +355,13 @@
                                         parameter = {
                                             newsId: $.getQuertString("newsId"), timeSpent: duration
                                         }
-                                    }else {
+                                    } else {
                                         eventIdss = ''
                                     }
 
                                     break;
                                 case '/news/information/newsDetails':
-                                    
+
                                     if ($.getQuertString("module") === 'notice') {
                                         eventIdss = eventIdss[$.getQuertString("module")]
                                         parameter = {
@@ -385,7 +372,7 @@
                                         parameter = {
                                             researchId: $.getQuertString("newsId"), timeSpent: duration
                                         }
-                                    }else{
+                                    } else {
                                         eventIdss = ''
                                     }
 
@@ -398,12 +385,12 @@
                         console.log("duration>>>>>>>>>>>>>>", duration)
                         console.log("eventIdss>>>>>>>>>>>>>>", eventIdss)
                         console.log("parameter>>>>>>>>>>>>>>", parameter)
-                        if(eventIdss!==''){
+                        if (eventIdss !== '') {
                             _this.HttpIntance.post('/appevent.jspa', { eventId: eventIdss, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
                                 headers: {
                                     headerEvent: _this.getHeadEvent
                                 },
-                                async:false
+                                async: false
                             })
                         }
                     }
@@ -412,7 +399,7 @@
                 }
             }
         }
-        HNtrack.prototype.handleTrack = function (eventId, parameter,async=true) {
+        track.prototype.handleTrack = function (eventId, parameter, async = true) {
             parameter = JSON.stringify(parameter)
             this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: this.userId }, {
                 headers: {
@@ -421,7 +408,7 @@
                 async
             })
         }
-        HNtrack.prototype.customTrack = function () {
+        track.prototype.customTrack = function () {
             try {
                 let _this = this
                 $(document).off("click", "[data-eventid]")
@@ -437,12 +424,12 @@
                     });
                     parameter = JSON.stringify(parameter)
                     let async = $(this).data("async")
-                    
+
                     _this.HttpIntance.post('/appevent.jspa', { eventId, parameter, eventDate: new Date().Format("yyyy-MM-dd hh:mm:ss"), userId: _this.userId }, {
                         headers: {
                             headerEvent: _this.getHeadEvent
                         },
-                        async:!async
+                        async: !async
                     })
 
                 })
@@ -450,7 +437,7 @@
                 console.log(error)
             }
         };
-        HNtrack.prototype.autoTrack = function () {
+        track.prototype.autoTrack = function () {
             let aList = $("a")
             aList.off("click")
             aList.on("click", () => {
@@ -468,7 +455,7 @@
             })
             //图片点击
         };
-        HNtrack.prototype.autoTrackSinglePage = function () {
+        track.prototype.autoTrackSinglePage = function () {
 
         };
         HNtrack.prototype.server_config = function () {
@@ -487,6 +474,6 @@
         return HNtrack;
     }())
 
-    window.HNtrack = HNtrack
+    window.track = track
 })(Zepto)
 
